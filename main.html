@@ -1,16 +1,64 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-	<link rel="stylesheet" href="styles.css">
+    <title>Custom EventTarget Implementation</title>
+    <script>
+        class EventTarget {
+            constructor() {
+                this.listeners = {}; // Object to store event listeners
+            }
+
+            addEventListener(event, callback) {
+                if (!this.listeners[event]) {
+                    this.listeners[event] = new Set(); // Use a Set to avoid duplicate callbacks
+                }
+                this.listeners[event].add(callback);
+            }
+
+            removeEventListener(event, callback) {
+                if (this.listeners[event]) {
+                    this.listeners[event].delete(callback);
+                    if (this.listeners[event].size === 0) {
+                        delete this.listeners[event];
+                    }
+                }
+            }
+
+            dispatchEvent(event) {
+                if (this.listeners[event]) {
+                    for (const callback of this.listeners[event]) {
+                        callback(); // Invoke each callback
+                    }
+                }
+            }
+        }
+
+        // Sample Usage
+        window.onload = () => {
+            const target = new EventTarget();
+            const logHello = () => console.log('hello');
+            const logWorld = () => console.log('world');
+
+            target.addEventListener('hello', logHello);
+            target.addEventListener('world', logWorld);
+
+            console.log('Dispatching "hello":');
+            target.dispatchEvent('hello'); // Logs 'hello'
+
+            console.log('Dispatching "world":');
+            target.dispatchEvent('world'); // Logs 'world'
+
+            target.removeEventListener('hello', logHello);
+
+            console.log('Dispatching "hello" after removal:');
+            target.dispatchEvent('hello'); // Does nothing
+
+            console.log('Dispatching "world" again:');
+            target.dispatchEvent('world'); // Logs 'world'
+        };
+    </script>
 </head>
-
 <body>
-	<!-- the entire body must be written by student -->
-    <script type="text/javascript" src="./script.js">
-</script>
-
+    <h1>Check the Console for Output</h1>
 </body>
-
 </html>
